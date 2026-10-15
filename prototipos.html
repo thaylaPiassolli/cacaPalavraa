@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Três direções de interface para o jogo de adivinhação de palavras.">
+  <title>Laboratório de interfaces — jogo de palavras</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --ink: #17251f;
+      --muted: #68766f;
+      --line: #e4e9e5;
+      --paper: #f5f7f4;
+      --surface: #fff;
+      --green: #176b50;
+      --green-soft: #e5f3ec;
+      --shadow: 0 24px 70px rgba(27, 45, 36, .09);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(218, 237, 223, .55), transparent 34rem),
+        var(--paper);
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 34px 0 58px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 54px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      color: white;
+      background: #176b50;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .masthead-note {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 690px;
+      margin: 0;
+      font-size: clamp(36px, 5.4vw, 64px);
+      line-height: .99;
+      letter-spacing: -.065em;
+    }
+
+    .intro-copy {
+      max-width: 340px;
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .concept-picker {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 17px;
+    }
+
+    .concept-tab {
+      display: flex;
+      min-height: 82px;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 17px;
+      border: 1px solid #dfe6e0;
+      border-radius: 16px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .77);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .18s, transform .18s, background .18s, box-shadow .18s;
+    }
+
+    .concept-tab:hover { transform: translateY(-2px); }
+    .concept-tab:focus-visible, .mock-button:focus-visible {
+      outline: 3px solid #286db4;
+      outline-offset: 3px;
+    }
+
+    .concept-tab[aria-selected="true"] {
+      border-color: #39765c;
+      background: #fff;
+      box-shadow: 0 6px 22px rgba(34, 74, 52, .1);
+    }
+
+    .tab-number {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: #536158;
+      background: #f5f7f4;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    [aria-selected="true"] .tab-number { color: #fff; border-color: #176b50; background: #176b50; }
+
+    .tab-copy { display: grid; gap: 4px; }
+    .tab-copy strong { font-size: 14px; letter-spacing: -.02em; }
+    .tab-copy span { color: var(--muted); font-size: 12px; }
+
+    .stage {
+      overflow: hidden;
+      min-height: 720px;
+      border: 1px solid rgba(218, 226, 219, .9);
+      border-radius: 24px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .concept-panel[hidden] { display: none; }
+
+    .concept-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 19px 25px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .caption-title { display: grid; gap: 4px; }
+    .caption-title strong { font-size: 14px; letter-spacing: -.02em; }
+    .caption-title span { color: var(--muted); font-size: 12px; }
+
+    .concept-index {
+      color: #758078;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .mockup {
+      --mock-ink: #1b2c25;
+      --mock-muted: #6b7770;
+      --mock-bg: #fbfcfa;
+      --mock-card: #fff;
+      --mock-line: #e0e6e1;
+      --mock-action: #176b50;
+      --mock-key: #edf1ed;
+      --tile: 54px;
+      min-height: 660px;
+      padding: 34px;
+      color: var(--mock-ink);
+      background: var(--mock-bg);
+    }
+
+    .game-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      max-width: 1000px;
+      margin: 0 auto 26px;
+    }
+
+    .game-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: -.04em;
+    }
+
+    .game-name-mark {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border-radius: 10px;
+      color: white;
+      background: var(--mock-action);
+      font-size: 15px;
+    }
+
+    .mock-link {
+      border: 0;
+      padding: 8px 10px;
+      border-radius: 9px;
+      color: var(--mock-ink);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .game-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 225px;
+      gap: 30px;
+      max-width: 890px;
+      margin: 0 auto;
+    }
+
+    .board-area { display: flex; flex-direction: column; align-items: center; }
+
+    .game-heading {
+      margin: 2px 0 7px;
+      text-align: center;
+      font-size: clamp(24px, 3vw, 31px);
+      font-weight: 820;
+      letter-spacing: -.055em;
+    }
+
+    .game-subtitle {
+      margin: 0 0 22px;
+      color: var(--mock-muted);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .difficulty-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 20px;
+      padding: 4px;
+      border: 1px solid var(--mock-line);
+      border-radius: 12px;
+      background: var(--mock-card);
+    }
+
+    .difficulty {
+      min-height: 36px;
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 8px;
+      color: var(--mock-muted);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+
+    .difficulty.selected {
+      color: white;
+      background: var(--mock-action);
+    }
+
+    .attempt-label {
+      align-self: flex-end;
+      margin: -8px 0 10px;
+      color: var(--mock-muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, var(--tile));
+      gap: 7px;
+      margin: 0 auto 17px;
+    }
+
+    .tile {
+      display: grid;
+      width: var(--tile);
+      height: var(--tile);
+      place-items: center;
+      border: 1.5px solid #cdd6cf;
+      border-radius: 9px;
+      color: var(--mock-ink);
+      background: var(--mock-card);
+      font-size: 23px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .tile.filled { border-color: #8d9b91; }
+    .tile.current { border: 2px solid var(--mock-action); box-shadow: 0 0 0 2px color-mix(in srgb, var(--mock-action) 12%, transparent); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px 13px;
+      margin: 0 0 17px;
+      color: var(--mock-muted);
+      font-size: 11px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+
+    .legend-symbol {
+      display: inline-grid;
+      width: 19px;
+      height: 19px;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .legend-symbol.correct { color: #176b50; background: #e5f3ec; }
+    .legend-symbol.present { color: #915b09; background: #fff2d7; }
+    .legend-symbol.absent { color: #5c6860; background: #edf0ed; }
+
+    .input-preview {
+      display: flex;
+      width: min(100%, 350px);
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 13px;
+      padding: 8px 8px 8px 14px;
+      border: 1px solid var(--mock-line);
+      border-radius: 12px;
+      color: var(--mock-muted);
+      background: var(--mock-card);
+      font-size: 12px;
+    }
+
+    .mock-button {
+      min-height: 40px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 9px;
+      color: white;
+      background: var(--mock-action);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .keyboard {
+      display: grid;
+      width: min(100%, 490px);
+      gap: 5px;
+      margin: 0 auto;
+    }
+
+    .keyboard-row { display: flex; justify-content: center; gap: 4px; }
+
+    .key {
+      display: grid;
+      min-width: 29px;
+      height: 39px;
+      flex: 1 1 0;
+      place-items: center;
+      border: 0;
+      border-radius: 6px;
+      color: var(--mock-ink);
+      background: var(--mock-key);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .key.wide { flex: 1.55 1 0; font-size: 9px; }
+
+    .side-card {
+      align-self: start;
+      margin-top: 75px;
+      padding: 18px;
+      border: 1px solid var(--mock-line);
+      border-radius: 15px;
+      background: var(--mock-card);
+    }
+
+    .side-card h3 {
+      margin: 0 0 16px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+
+    .stat-list { display: grid; gap: 0; }
+    .stat { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1px solid var(--mock-line); }
+    .stat span { color: var(--mock-muted); font-size: 11px; }
+    .stat strong { font-size: 16px; font-variant-numeric: tabular-nums; }
+    .side-note { margin: 15px 0 0; padding-top: 13px; border-top: 1px solid var(--mock-line); color: var(--mock-muted); font-size: 10px; line-height: 1.5; }
+
+    .mock-footer {
+      max-width: 890px;
+      margin: 22px auto 0;
+      color: var(--mock-muted);
+      text-align: center;
+      font-size: 10px;
+    }
+
+    /* Direção 1: leve, acolhedora e centrada no fluxo. */
+    .mockup--focus {
+      --mock-bg: #fbfcfa;
+      --mock-card: #fff;
+      --mock-action: #176b50;
+      --mock-key: #edf1ed;
+    }
+    .mockup--focus .game-content { grid-template-columns: minmax(0, 1fr) 205px; }
+    .mockup--focus .board-area { padding: 0 0 8px; }
+    .mockup--focus .game-heading { font-size: 30px; }
+    .mockup--focus .game-name-mark { border-radius: 50%; }
+
+    /* Direção 2: leitura previsível, alvos claros e estados explicitamente nomeados. */
+    .mockup--access {
+      --mock-ink: #132438;
+      --mock-muted: #3f5061;
+      --mock-bg: #f5f8fb;
+      --mock-card: #fff;
+      --mock-line: #738294;
+      --mock-action: #064f9b;
+      --mock-key: #eaf1f7;
+      --tile: 60px;
+    }
+    .mockup--access .game-content { grid-template-columns: minmax(0, 1fr); max-width: 650px; }
+    .mockup--access .game-name-mark { border-radius: 8px; color: #fff; background: #064f9b; }
+    .mockup--access .game-name { font-size: 16px; }
+    .mockup--access .difficulty-group { border-width: 2px; }
+    .mockup--access .difficulty-select {
+      width: min(100%, 430px);
+      min-height: 48px;
+      margin: 0 0 20px;
+      padding: 0 42px 0 14px;
+      border: 2px solid #536579;
+      border-radius: 8px;
+      color: #132438;
+      background: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .mockup--access .difficulty-select:focus-visible { outline: 3px solid #064f9b; outline-offset: 3px; }
+    .mockup--access .tile { border-width: 2px; border-color: #738294; border-radius: 4px; }
+    .mockup--access .tile.current { border-color: #064f9b; box-shadow: 0 0 0 3px #d5e7f8; }
+    .mockup--access .legend { width: min(100%, 550px); justify-content: space-between; padding: 11px 13px; border: 2px solid #738294; border-radius: 8px; background: #fff; }
+    .mockup--access .legend-item { color: #132438; font-size: 11px; font-weight: 650; }
+    .mockup--access .legend-symbol { width: 24px; height: 24px; border-width: 2px; color: #132438; background: #fff; }
+    .mockup--access .legend-symbol.correct { border-width: 3px; border-color: #08745b; }
+    .mockup--access .legend-symbol.present { border-style: dashed; border-color: #8b5700; }
+    .mockup--access .legend-symbol.absent { border-color: #48596b; background: repeating-linear-gradient(135deg, #fff 0 3px, #e5ebf0 3px 5px); }
+    .mockup--access .input-preview { min-height: 52px; border-width: 2px; border-color: #738294; }
+    .mockup--access .input-preview > span { color: #24394e; font-weight: 650; }
+    .mockup--access .mock-button { min-height: 44px; color: #fff; background: #064f9b; }
+    .mockup--access .side-card { display: block; margin-top: 18px; border-width: 2px; }
+    .mockup--access .side-card .stat-list { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .mockup--access .side-card .stat { display: grid; justify-items: start; gap: 4px; }
+    .mockup--access .side-note { margin-top: 12px; padding-top: 12px; font-size: 11px; }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    /* Direção 3: diário de exploração com papel, tinta e linhas de mapa. */
+    .mockup--journal {
+      --mock-ink: #19364a;
+      --mock-muted: #536a77;
+      --mock-bg: #f4efe3;
+      --mock-card: #fffcf5;
+      --mock-line: #d8cebb;
+      --mock-action: #3567a5;
+      --mock-key: #e9e2d4;
+      --tile: 56px;
+      background-image: radial-gradient(#d6cbb7 0.7px, transparent .7px);
+      background-size: 13px 13px;
+    }
+    .mockup--journal .game-content { grid-template-columns: minmax(0, 1fr) 210px; }
+    .mockup--journal .game-name-mark { border-radius: 4px; background: #3567a5; transform: rotate(-4deg); }
+    .mockup--journal .game-heading { font-family: Georgia, "Times New Roman", serif; font-weight: 700; letter-spacing: -.04em; }
+    .mockup--journal .game-subtitle { font-family: Georgia, "Times New Roman", serif; font-size: 14px; }
+    .mockup--journal .difficulty-group { border-radius: 4px; border-style: dashed; }
+    .mockup--journal .difficulty { border-radius: 2px; }
+    .mockup--journal .difficulty.selected { background: #3567a5; }
+    .mockup--journal .tile { border-radius: 3px; box-shadow: 2px 2px 0 #e4dbc9; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .mockup--journal .tile.current { border-color: #3567a5; }
+    .mockup--journal .side-card { border-radius: 4px; border-style: dashed; box-shadow: 3px 3px 0 rgba(92, 78, 55, .08); }
+    .mockup--journal .mock-button { border-radius: 4px; background: #3567a5; }
+    .mockup--journal .key { border-radius: 3px; box-shadow: 0 2px 0 #d6cbb7; }
+    .mockup--journal .mock-footer { font-family: Georgia, "Times New Roman", serif; }
+
+    .comparison-note {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 20px;
+      margin-top: 15px;
+      padding: 17px 20px;
+      border: 1px solid #e1e7e2;
+      border-radius: 14px;
+      color: #55645b;
+      background: rgba(255, 255, 255, .64);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .comparison-note strong { color: var(--ink); }
+    .prototype-stamp { color: #69786f; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+
+    @media (max-width: 760px) {
+      .page { width: min(100% - 28px, 600px); padding-top: 20px; }
+      .masthead { padding-bottom: 36px; }
+      .masthead-note { font-size: 9px; text-align: right; }
+      .intro { grid-template-columns: 1fr; gap: 13px; margin-bottom: 20px; }
+      .intro-copy { max-width: 500px; font-size: 14px; }
+      .concept-picker { gap: 7px; }
+      .concept-tab { min-height: 72px; align-items: flex-start; gap: 8px; padding: 11px 9px; border-radius: 12px; }
+      .tab-number { width: 27px; height: 27px; border-radius: 8px; font-size: 10px; }
+      .tab-copy strong { font-size: 11px; }
+      .tab-copy span { font-size: 9px; line-height: 1.35; }
+      .stage { min-height: auto; border-radius: 17px; }
+      .concept-caption { align-items: flex-start; padding: 14px 16px; }
+      .caption-title span { max-width: 240px; line-height: 1.4; }
+      .mockup { --tile: min(14vw, 52px); min-height: 690px; padding: 20px 13px 24px; }
+      .game-topbar { margin-bottom: 24px; }
+      .game-content, .mockup--focus .game-content, .mockup--journal .game-content { grid-template-columns: 1fr; gap: 14px; }
+      .mockup--access { --tile: min(14.5vw, 55px); }
+      .game-heading { font-size: 26px !important; }
+      .game-subtitle { margin-bottom: 18px; }
+      .difficulty-group { gap: 1px; margin-bottom: 20px; }
+      .difficulty { padding: 7px 8px; font-size: 10px; }
+      .board { gap: 5px; margin-bottom: 14px; }
+      .tile { border-radius: 7px; font-size: 20px; }
+      .side-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 9px; margin: 3px 0 0; padding: 12px; }
+      .side-card h3 { grid-column: 1 / -1; margin: 0; }
+      .stat-list { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+      .stat { display: grid; justify-items: start; gap: 3px; padding: 8px 0; border-top: 1px solid var(--mock-line); }
+      .stat span { font-size: 9px; }
+      .stat strong { font-size: 14px; }
+      .side-note { margin: 0; padding: 0 0 0 9px; border: 0; border-left: 1px solid var(--mock-line); font-size: 9px; }
+      .mock-footer { margin-top: 16px; line-height: 1.5; }
+      .comparison-note { grid-template-columns: 1fr; gap: 7px; padding: 14px; }
+    }
+
+    @media (max-width: 390px) {
+      .tab-copy span { display: none; }
+      .concept-tab { align-items: center; min-height: 57px; }
+      .mockup { padding-right: 9px; padding-left: 9px; }
+      .legend { gap: 6px; font-size: 9px; }
+      .legend-item { gap: 4px; }
+      .key { min-width: 22px; height: 35px; font-size: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">a</span> Laboratório de produto</div>
+      <div class="masthead-note">Exploração de interface · PRD v1</div>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Painel de conceitos · 01 / 03</p>
+        <h1 id="page-title">Uma mecânica.<br>Três experiências.</h1>
+      </div>
+      <p class="intro-copy">Três caminhos visuais para o mesmo desafio de palavras — do jogo em primeiro plano a uma experiência acessível ou com clima de diário.</p>
+    </section>
+
+    <div class="concept-picker" role="tablist" aria-label="Escolha uma proposta de interface">
+      <button class="concept-tab" id="tab-focus" type="button" role="tab" aria-selected="true" aria-controls="panel-focus">
+        <span class="tab-number">01</span>
+        <span class="tab-copy"><strong>Palavra em foco</strong><span>Leve · direta · familiar</span></span>
+      </button>
+      <button class="concept-tab" id="tab-access" type="button" role="tab" aria-selected="false" aria-controls="panel-access" tabindex="-1">
+        <span class="tab-number">02</span>
+        <span class="tab-copy"><strong>Clareza primeiro</strong><span>Contraste · sinais · leitura</span></span>
+      </button>
+      <button class="concept-tab" id="tab-journal" type="button" role="tab" aria-selected="false" aria-controls="panel-journal" tabindex="-1">
+        <span class="tab-number">03</span>
+        <span class="tab-copy"><strong>Caderno de bordo</strong><span>Exploração · papel · pistas</span></span>
+      </button>
+    </div>
+
+    <main class="stage">
+      <section class="concept-panel" id="panel-focus" role="tabpanel" aria-labelledby="tab-focus">
+        <div class="concept-caption">
+          <div class="caption-title"><strong>Palavra em foco</strong><span>Fluxo simples; tabuleiro, dificuldade e entrada em primeiro plano.</span></div>
+          <span class="concept-index">Direção 01</span>
+        </div>
+        <div class="mockup mockup--focus">
+          <header class="game-topbar">
+            <div class="game-name"><span class="game-name-mark" aria-hidden="true">a</span> palavrinha</div>
+            <button class="mock-link" type="button">Como jogar</button>
+          </header>
+          <div class="game-content">
+            <section class="board-area" aria-label="Área da partida">
+              <h2 class="game-heading">Descubra a palavra</h2>
+              <p class="game-subtitle">Uma palavra nova a cada partida. Sem pressa.</p>
+              <div class="difficulty-group" aria-label="Dificuldade selecionada: Médio">
+                <span class="difficulty">Fácil · 4</span><span class="difficulty selected">Médio · 5</span><span class="difficulty">Difícil · 6</span>
+              </div>
+              <p class="attempt-label">Tentativa 1 de 6</p>
+              <div class="board" role="img" aria-label="Tabuleiro de seis tentativas por cinco letras. Primeiro palpite iniciado: C, A.">
+                <div class="tile current">C</div><div class="tile current">A</div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+              </div>
+              <div class="legend" aria-label="Legenda das pistas">
+                <span class="legend-item"><span class="legend-symbol correct">✓</span> lugar certo</span>
+                <span class="legend-item"><span class="legend-symbol present">↗</span> outra posição</span>
+                <span class="legend-item"><span class="legend-symbol absent">×</span> não aparece</span>
+              </div>
+              <div class="input-preview"><span>Digite seu palpite</span><button class="mock-button" type="button">Enviar</button></div>
+              <div class="keyboard" aria-hidden="true">
+                <div class="keyboard-row"><span class="key">Q</span><span class="key">W</span><span class="key">E</span><span class="key">R</span><span class="key">T</span><span class="key">Y</span><span class="key">U</span><span class="key">I</span><span class="key">O</span><span class="key">P</span></div>
+                <div class="keyboard-row"><span class="key">A</span><span class="key">S</span><span class="key">D</span><span class="key">F</span><span class="key">G</span><span class="key">H</span><span class="key">J</span><span class="key">K</span><span class="key">L</span></div>
+                <div class="keyboard-row"><span class="key">Z</span><span class="key">X</span><span class="key">C</span><span class="key">V</span><span class="key">B</span><span class="key">N</span><span class="key">M</span></div>
+              </div>
+            </section>
+            <aside class="side-card">
+              <h3>Suas estatísticas</h3>
+              <div class="stat-list">
+                <div class="stat"><span>Partidas</span><strong>12</strong></div>
+                <div class="stat"><span>Vitórias</span><strong>9</strong></div>
+                <div class="stat"><span>Média nas vitórias</span><strong>4,2</strong></div>
+              </div>
+              <p class="side-note">Jogue sem criar conta. Seu progresso fica com você.</p>
+            </aside>
+          </div>
+          <p class="mock-footer">Protótipo conceitual · interface ilustrativa, sem validação de palpites.</p>
+        </div>
+      </section>
+
+      <section class="concept-panel" id="panel-access" role="tabpanel" aria-labelledby="tab-access" hidden>
+        <div class="concept-caption">
+          <div class="caption-title"><strong>Clareza primeiro</strong><span>Contraste elevado e uma legenda que nomeia cada pista, além de distingui-la visualmente.</span></div>
+          <span class="concept-index">Direção 02</span>
+        </div>
+        <div class="mockup mockup--access">
+          <header class="game-topbar">
+            <div class="game-name"><span class="game-name-mark" aria-hidden="true">a</span> PALAVRA</div>
+            <button class="mock-link" type="button">REGRAS</button>
+          </header>
+          <div class="game-content">
+            <section class="board-area" aria-label="Área da partida">
+              <h2 class="game-heading">Qual é a palavra?</h2>
+              <p class="game-subtitle">Use as pistas para encontrar a resposta.</p>
+              <label class="visually-hidden" for="access-difficulty">Escolha a dificuldade</label>
+              <select class="difficulty-select" id="access-difficulty">
+                <option>Fácil — 4 letras, 5 tentativas</option>
+                <option selected>Médio — 5 letras, 6 tentativas</option>
+                <option>Difícil — 6 letras, 7 tentativas</option>
+              </select>
+              <p class="attempt-label">TENTATIVA 1 DE 6</p>
+              <div class="board" role="img" aria-label="Tabuleiro de seis tentativas por cinco letras. Primeiro palpite iniciado: C, A.">
+                <div class="tile current">C</div><div class="tile current">A</div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+              </div>
+              <div class="legend" aria-label="Significado dos símbolos de feedback">
+                <span class="legend-item"><span class="legend-symbol correct">✓</span> Correta: lugar certo</span>
+                <span class="legend-item"><span class="legend-symbol present">↗</span> Presente: outra posição</span>
+                <span class="legend-item"><span class="legend-symbol absent">×</span> Ausente: não aparece</span>
+              </div>
+              <div class="input-preview"><span>Seu palpite · 5 letras</span><button class="mock-button" type="button">Enviar palpite</button></div>
+            </section>
+            <aside class="side-card">
+              <h3>ESTATÍSTICAS</h3>
+              <div class="stat-list">
+                <div class="stat"><span>Partidas</span><strong>12</strong></div>
+                <div class="stat"><span>Vitórias</span><strong>9</strong></div>
+                <div class="stat"><span>Média de tentativas</span><strong>4,2</strong></div>
+              </div>
+              <p class="side-note">Entrada por teclado, foco visível e feedback que não depende apenas de cor.</p>
+            </aside>
+          </div>
+          <p class="mock-footer">Os sinais e rótulos acompanham a cor; teclado e foco devem ser considerados na implementação.</p>
+        </div>
+      </section>
+
+      <section class="concept-panel" id="panel-journal" role="tabpanel" aria-labelledby="tab-journal" hidden>
+        <div class="concept-caption">
+          <div class="caption-title"><strong>Caderno de bordo</strong><span>Uma atmosfera editorial de exploração sem tirar a mecânica do centro.</span></div>
+          <span class="concept-index">Direção 03</span>
+        </div>
+        <div class="mockup mockup--journal">
+          <header class="game-topbar">
+            <div class="game-name"><span class="game-name-mark" aria-hidden="true">✳</span> Caderno de Bordo</div>
+            <button class="mock-link" type="button">Ver regras</button>
+          </header>
+          <div class="game-content">
+            <section class="board-area" aria-label="Área da partida">
+              <h2 class="game-heading">Descubra a palavra</h2>
+              <p class="game-subtitle">Uma pista de cada vez. Boa exploração.</p>
+              <div class="difficulty-group" aria-label="Dificuldade selecionada: Médio">
+                <span class="difficulty">Fácil · 4</span><span class="difficulty selected">Médio · 5</span><span class="difficulty">Difícil · 6</span>
+              </div>
+              <p class="attempt-label">Tentativa 1 de 6</p>
+              <div class="board" role="img" aria-label="Tabuleiro de seis tentativas por cinco letras. Primeiro palpite iniciado: C, A.">
+                <div class="tile current">C</div><div class="tile current">A</div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+              </div>
+              <div class="legend" aria-label="Legenda das pistas">
+                <span class="legend-item"><span class="legend-symbol correct">✓</span> lugar certo</span>
+                <span class="legend-item"><span class="legend-symbol present">↗</span> outra posição</span>
+                <span class="legend-item"><span class="legend-symbol absent">×</span> não aparece</span>
+              </div>
+              <div class="input-preview"><span>Escreva sua próxima pista</span><button class="mock-button" type="button">Conferir</button></div>
+              <div class="keyboard" aria-hidden="true">
+                <div class="keyboard-row"><span class="key">Q</span><span class="key">W</span><span class="key">E</span><span class="key">R</span><span class="key">T</span><span class="key">Y</span><span class="key">U</span><span class="key">I</span><span class="key">O</span><span class="key">P</span></div>
+                <div class="keyboard-row"><span class="key">A</span><span class="key">S</span><span class="key">D</span><span class="key">F</span><span class="key">G</span><span class="key">H</span><span class="key">J</span><span class="key">K</span><span class="key">L</span></div>
+                <div class="keyboard-row"><span class="key">Z</span><span class="key">X</span><span class="key">C</span><span class="key">V</span><span class="key">B</span><span class="key">N</span><span class="key">M</span></div>
+              </div>
+            </section>
+            <aside class="side-card">
+              <h3>Seu percurso</h3>
+              <div class="stat-list">
+                <div class="stat"><span>Partidas</span><strong>12</strong></div>
+                <div class="stat"><span>Vitórias</span><strong>9</strong></div>
+                <div class="stat"><span>Média nas vitórias</span><strong>4,2</strong></div>
+              </div>
+              <p class="side-note">Cada partida é uma nova rota. O resultado pode ser compartilhado sem a resposta.</p>
+            </aside>
+          </div>
+          <p class="mock-footer">Papel, tinta e marcadores de rota · uma direção visual para testar com jogadores.</p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="comparison-note" aria-label="Resumo dos conceitos">
+      <span><strong>Como comparar:</strong> a primeira proposta prioriza a rapidez do fluxo; a segunda evidencia as pistas e prioriza legibilidade; a terceira testa uma identidade mais narrativa. Todas preservam as mesmas regras do PRD.</span>
+      <span class="prototype-stamp">Mockups estáticos</span>
+    </aside>
+  </div>
+
+  <script>
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
+
+    function selectConcept(index, moveFocus) {
+      tabs.forEach((tab, tabIndex) => {
+        const selected = tabIndex === index;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        panels[tabIndex].hidden = !selected;
+      });
+      if (moveFocus) tabs[index].focus();
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectConcept(index, false));
+      tab.addEventListener('keydown', (event) => {
+        let nextIndex = index;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = tabs.length - 1;
+        if (nextIndex !== index) {
+          event.preventDefault();
+          selectConcept(nextIndex, true);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
