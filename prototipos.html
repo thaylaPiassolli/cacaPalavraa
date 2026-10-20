@@ -250,7 +250,22 @@
       background: transparent;
       font-size: 12px;
       font-weight: 700;
+      cursor: pointer;
     }
+
+    .rules-dialog {
+      width: min(460px, calc(100% - 32px));
+      padding: 24px;
+      border: 1px solid #dfe6e0;
+      border-radius: 18px;
+      color: var(--ink);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .rules-dialog::backdrop { background: rgba(23, 37, 31, .48); }
+    .rules-dialog h2 { margin: 0 0 12px; font-size: 24px; letter-spacing: -.04em; }
+    .rules-dialog ol { padding-left: 22px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .rules-close { display: block; margin-left: auto; border: 0; padding: 6px 8px; color: var(--muted); background: transparent; font: inherit; font-weight: 750; cursor: pointer; }
 
     .game-content {
       display: grid;
@@ -338,6 +353,9 @@
 
     .tile.filled { border-color: #8d9b91; }
     .tile.current { border: 2px solid var(--mock-action); box-shadow: 0 0 0 2px color-mix(in srgb, var(--mock-action) 12%, transparent); }
+    .tile.correct, .key.correct { border-color: #176b50; color: #fff; background: #176b50; }
+    .tile.present, .key.present { border-color: #915b09; color: #fff; background: #915b09; }
+    .tile.absent, .key.absent { border-color: #5c6860; color: #fff; background: #5c6860; }
 
     .legend {
       display: flex;
@@ -392,6 +410,41 @@
       font-weight: 800;
     }
 
+    .guess-form {
+      display: flex;
+      width: min(100%, 350px);
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 13px;
+      padding: 7px 7px 7px 12px;
+      border: 1px solid var(--mock-line);
+      border-radius: 12px;
+      background: var(--mock-card);
+    }
+
+    .guess-input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--mock-ink);
+      background: transparent;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .guess-form:focus-within { outline: 3px solid #286db4; outline-offset: 2px; }
+    .game-message { min-height: 22px; margin: 0 0 10px; color: var(--mock-muted); font-size: 12px; text-align: center; }
+    .game-message[data-state="error"] { color: #a12b24; font-weight: 750; }
+    .game-message[data-state="success"] { color: var(--mock-action); font-weight: 750; }
+    .new-game { margin-left: 7px; border: 0; color: var(--mock-action); background: transparent; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+    .difficulty { cursor: pointer; }
+    .difficulty:focus-visible, .key:focus-visible, .new-game:focus-visible { outline: 3px solid #286db4; outline-offset: 2px; }
+    .difficulty[aria-pressed="true"] { color: white; background: var(--mock-action); }
+
     .keyboard {
       display: grid;
       width: min(100%, 490px);
@@ -413,6 +466,7 @@
       background: var(--mock-key);
       font-size: 11px;
       font-weight: 800;
+      cursor: pointer;
     }
 
     .key.wide { flex: 1.55 1 0; font-size: 9px; }
@@ -474,6 +528,7 @@
     .mockup--access .game-name-mark { border-radius: 8px; color: #fff; background: #064f9b; }
     .mockup--access .game-name { font-size: 16px; }
     .mockup--access .difficulty-group { border-width: 2px; }
+    .mockup--access .difficulty[aria-pressed="true"] { color: #fff; background: #064f9b; }
     .mockup--access .difficulty-select {
       width: min(100%, 430px);
       min-height: 48px;
@@ -496,8 +551,8 @@
     .mockup--access .legend-symbol.correct { border-width: 3px; border-color: #08745b; }
     .mockup--access .legend-symbol.present { border-style: dashed; border-color: #8b5700; }
     .mockup--access .legend-symbol.absent { border-color: #48596b; background: repeating-linear-gradient(135deg, #fff 0 3px, #e5ebf0 3px 5px); }
-    .mockup--access .input-preview { min-height: 52px; border-width: 2px; border-color: #738294; }
-    .mockup--access .input-preview > span { color: #24394e; font-weight: 650; }
+    .mockup--access .guess-form { min-height: 52px; border-width: 2px; border-color: #738294; }
+    .mockup--access .guess-input { color: #24394e; font-weight: 650; }
     .mockup--access .mock-button { min-height: 44px; color: #fff; background: #064f9b; }
     .mockup--access .side-card { display: block; margin-top: 18px; border-width: 2px; }
     .mockup--access .side-card .stat-list { grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -532,7 +587,7 @@
     .mockup--journal .game-subtitle { font-family: Georgia, "Times New Roman", serif; font-size: 14px; }
     .mockup--journal .difficulty-group { border-radius: 4px; border-style: dashed; }
     .mockup--journal .difficulty { border-radius: 2px; }
-    .mockup--journal .difficulty.selected { background: #3567a5; }
+    .mockup--journal .difficulty[aria-pressed="true"] { color: white; background: #3567a5; }
     .mockup--journal .tile { border-radius: 3px; box-shadow: 2px 2px 0 #e4dbc9; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
     .mockup--journal .tile.current { border-color: #3567a5; }
     .mockup--journal .side-card { border-radius: 4px; border-style: dashed; box-shadow: 3px 3px 0 rgba(92, 78, 55, .08); }
@@ -646,7 +701,7 @@
         <div class="mockup mockup--focus">
           <header class="game-topbar">
             <div class="game-name"><span class="game-name-mark" aria-hidden="true">a</span> palavrinha</div>
-            <button class="mock-link" type="button">Como jogar</button>
+            <button class="mock-link" type="button" data-open-rules>Como jogar</button>
           </header>
           <div class="game-content">
             <section class="board-area" aria-label="Área da partida">
@@ -683,10 +738,10 @@
                 <div class="stat"><span>Vitórias</span><strong>9</strong></div>
                 <div class="stat"><span>Média nas vitórias</span><strong>4,2</strong></div>
               </div>
-              <p class="side-note">Jogue sem criar conta. Seu progresso fica com você.</p>
+              <p class="side-note">Estatísticas desta sessão. Jogue sem criar conta.</p>
             </aside>
           </div>
-          <p class="mock-footer">Protótipo conceitual · interface ilustrativa, sem validação de palpites.</p>
+          <p class="mock-footer">Jogo de demonstração · digite o palpite ou use o teclado na tela.</p>
         </div>
       </section>
 
@@ -698,7 +753,7 @@
         <div class="mockup mockup--access">
           <header class="game-topbar">
             <div class="game-name"><span class="game-name-mark" aria-hidden="true">a</span> PALAVRA</div>
-            <button class="mock-link" type="button">REGRAS</button>
+            <button class="mock-link" type="button" data-open-rules>REGRAS</button>
           </header>
           <div class="game-content">
             <section class="board-area" aria-label="Área da partida">
@@ -733,10 +788,10 @@
                 <div class="stat"><span>Vitórias</span><strong>9</strong></div>
                 <div class="stat"><span>Média de tentativas</span><strong>4,2</strong></div>
               </div>
-              <p class="side-note">Entrada por teclado, foco visível e feedback que não depende apenas de cor.</p>
+              <p class="side-note">Entrada pelo teclado físico ou virtual, com pistas visuais e textuais.</p>
             </aside>
           </div>
-          <p class="mock-footer">Os sinais e rótulos acompanham a cor; teclado e foco devem ser considerados na implementação.</p>
+          <p class="mock-footer">Jogo de demonstração · digite o palpite ou use o teclado na tela.</p>
         </div>
       </section>
 
@@ -748,7 +803,7 @@
         <div class="mockup mockup--journal">
           <header class="game-topbar">
             <div class="game-name"><span class="game-name-mark" aria-hidden="true">✳</span> Caderno de Bordo</div>
-            <button class="mock-link" type="button">Ver regras</button>
+            <button class="mock-link" type="button" data-open-rules>Ver regras</button>
           </header>
           <div class="game-content">
             <section class="board-area" aria-label="Área da partida">
@@ -785,23 +840,71 @@
                 <div class="stat"><span>Vitórias</span><strong>9</strong></div>
                 <div class="stat"><span>Média nas vitórias</span><strong>4,2</strong></div>
               </div>
-              <p class="side-note">Cada partida é uma nova rota. O resultado pode ser compartilhado sem a resposta.</p>
+              <p class="side-note">Cada partida é uma nova rota. Comece outra após concluir o desafio.</p>
             </aside>
           </div>
-          <p class="mock-footer">Papel, tinta e marcadores de rota · uma direção visual para testar com jogadores.</p>
+          <p class="mock-footer">Jogo de demonstração · digite o palpite ou use o teclado na tela.</p>
         </div>
       </section>
     </main>
 
     <aside class="comparison-note" aria-label="Resumo dos conceitos">
       <span><strong>Como comparar:</strong> a primeira proposta prioriza a rapidez do fluxo; a segunda evidencia as pistas e prioriza legibilidade; a terceira testa uma identidade mais narrativa. Todas preservam as mesmas regras do PRD.</span>
-      <span class="prototype-stamp">Mockups estáticos</span>
+      <span class="prototype-stamp">Jogo funcional</span>
     </aside>
   </div>
+
+  <dialog class="rules-dialog" id="rules-dialog" aria-labelledby="rules-title">
+    <button class="rules-close" type="button" data-close-rules>Fechar</button>
+    <h2 id="rules-title">Como jogar</h2>
+    <ol>
+      <li>Escolha a dificuldade e descubra a palavra pelo número de letras e tentativas disponíveis.</li>
+      <li>Digite um palpite aceito com o tamanho indicado e pressione Enter ou Enviar.</li>
+      <li>Verde indica letra no lugar certo; amarelo, letra em outra posição; cinza, letra ausente.</li>
+      <li>Ao acertar ou acabar as tentativas, veja o resultado e inicie outra partida.</li>
+    </ol>
+  </dialog>
 
   <script>
     const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
     const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
+    const difficulties = {
+      easy: { label: 'Fácil', length: 4, attempts: 5 },
+      medium: { label: 'Médio', length: 5, attempts: 6 },
+      hard: { label: 'Difícil', length: 6, attempts: 7 },
+    };
+    const words = {
+      4: ['AMOR', 'ARCO', 'AZUL', 'BOLA', 'BOLO', 'CAFE', 'CAMA', 'CASA', 'CEDO', 'CHAO', 'DADO', 'DOCE', 'FACA', 'FARO', 'FITA', 'FOGO', 'GATO', 'HOJE', 'JOGO', 'LEAO', 'MESA', 'MOTO', 'NAVE', 'OLHO', 'ONDA', 'OURO', 'PATO', 'POTE', 'REDE', 'ROSA', 'SALA', 'SUCO', 'TETO', 'VIDA', 'VILA', 'VOTO'],
+      5: ['ABRIR', 'AMIGO', 'AREIA', 'BARCO', 'BEBER', 'BOLSA', 'BRISA', 'CAMPO', 'CANTO', 'CARRO', 'CARTA', 'CHAVE', 'CINZA', 'CLARO', 'COISA', 'CORPO', 'DENTE', 'DIZER', 'FALAR', 'FELIZ', 'FOLHA', 'FORTE', 'FRUTA', 'GENTE', 'GRUPO', 'HOMEM', 'IDEIA', 'JOVEM', 'LIVRO', 'LUGAR', 'MANGA', 'MUNDO', 'NARIZ', 'NORTE', 'NUVEM', 'OLHAR', 'PADRE', 'PAPEL', 'PARTE', 'PEDRA', 'PERTO', 'PODER', 'PONTO', 'PRAIA', 'PRATO', 'RAIVA', 'SABER', 'SAUDE', 'TEMPO', 'TERRA', 'TIGRE', 'TOQUE', 'VALOR', 'VELHO', 'VENTO', 'VERDE', 'VISTA'],
+      6: ['ABRIGO', 'AMIGOS', 'ANIMAL', 'BAIRRO', 'BELEZA', 'BONECA', 'BRASIL', 'CABIDE', 'CAMISA', 'CANETA', 'CAVALO', 'CIDADE', 'COLHER', 'COMIDA', 'CORRER', 'DENTRO', 'ESCOLA', 'ESPERA', 'FLORES', 'IGREJA', 'JARDIM', 'JOGADA', 'MACACO', 'MENINO', 'MORADA', 'ÓCULOS', 'PANELA', 'PESSOA', 'QUEIJO', 'RECADO', 'SAPATO', 'VIAGEM'],
+    };
+    const keyboardRows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+    const game = {
+      difficulty: 'medium',
+      answer: '',
+      guesses: [],
+      draft: '',
+      status: 'playing',
+      lastAnswer: {},
+      stats: { games: 0, wins: 0, winningGuesses: 0 },
+    };
+
+    function normalizeWord(value) {
+      return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleUpperCase('pt-BR');
+    }
+
+    function newGame(difficulty = game.difficulty) {
+      game.difficulty = difficulty;
+      const { length } = difficulties[difficulty];
+      const choices = words[length];
+      const available = choices.filter((word) => word !== game.lastAnswer[difficulty]);
+      game.answer = available[Math.floor(Math.random() * available.length)];
+      game.lastAnswer[difficulty] = game.answer;
+      game.guesses = [];
+      game.draft = '';
+      game.status = 'playing';
+      renderGame();
+    }
 
     function selectConcept(index, moveFocus) {
       tabs.forEach((tab, tabIndex) => {
@@ -827,6 +930,309 @@
         }
       });
     });
+
+    function evaluateGuess(guess) {
+      const answer = Array.from(normalizeWord(game.answer));
+      const letters = Array.from(normalizeWord(guess));
+      const remaining = answer.slice();
+      const results = letters.map((letter, index) => {
+        if (letter === answer[index]) {
+          remaining[index] = '';
+          return 'correct';
+        }
+        return 'absent';
+      });
+
+      letters.forEach((letter, index) => {
+        if (results[index] === 'correct') return;
+        const foundAt = remaining.indexOf(letter);
+        if (foundAt !== -1) {
+          results[index] = 'present';
+          remaining[foundAt] = '';
+        }
+      });
+      return results;
+    }
+
+    function submitGuess() {
+      if (game.status !== 'playing') return;
+      const { length } = difficulties[game.difficulty];
+      const guess = normalizeWord(game.draft);
+      if (Array.from(guess).length !== length) {
+        announce(`Digite uma palavra com ${length} letras.`, 'error');
+        return;
+      }
+      if (!words[length].some((word) => normalizeWord(word) === guess)) {
+        announce('Essa palavra não está na lista de palpites aceitos.', 'error');
+        return;
+      }
+
+      const results = evaluateGuess(guess);
+      game.guesses.push({ word: game.draft, results });
+      game.draft = '';
+      if (guess === normalizeWord(game.answer)) {
+        game.status = 'won';
+        game.stats.wins += 1;
+        game.stats.winningGuesses += game.guesses.length;
+        game.stats.games += 1;
+        announce(`Você acertou em ${game.guesses.length} ${game.guesses.length === 1 ? 'tentativa' : 'tentativas'}!`, 'success', true);
+      } else if (game.guesses.length >= difficulties[game.difficulty].attempts) {
+        game.status = 'lost';
+        game.stats.games += 1;
+        announce(`Fim de jogo. A palavra era ${game.answer}.`, 'error', true);
+      } else {
+        announce('Palpite registrado. Continue tentando.', '', false);
+      }
+      renderGame();
+    }
+
+    function announce(message, state = '', finished = false) {
+      document.querySelectorAll('.game-message').forEach((element) => {
+        element.dataset.state = state;
+        element.dataset.finished = String(finished);
+        element.replaceChildren(document.createTextNode(message));
+        if (finished) {
+          const button = document.createElement('button');
+          button.className = 'new-game';
+          button.type = 'button';
+          button.textContent = 'Jogar novamente';
+          button.addEventListener('click', () => newGame());
+          element.append(button);
+        }
+      });
+    }
+
+    function renderGame() {
+      const config = difficulties[game.difficulty];
+      const keyboardState = {};
+      game.guesses.forEach(({ word, results }) => {
+        Array.from(normalizeWord(word)).forEach((letter, index) => {
+          const rank = { absent: 1, present: 2, correct: 3 };
+          if (!keyboardState[letter] || rank[results[index]] > rank[keyboardState[letter]]) {
+            keyboardState[letter] = results[index];
+          }
+        });
+      });
+
+      document.querySelectorAll('.mockup').forEach((mockup) => {
+        const board = mockup.querySelector('.board');
+        const attemptLabel = mockup.querySelector('.attempt-label');
+        const input = mockup.querySelector('.guess-input');
+        const message = mockup.querySelector('.game-message');
+        const rowCount = config.attempts;
+        const currentRow = game.guesses.length;
+        const draft = Array.from(game.draft);
+        board.replaceChildren();
+        board.setAttribute('role', 'grid');
+        board.style.gridTemplateColumns = `repeat(${config.length}, var(--tile))`;
+        board.setAttribute('aria-label', `Tabuleiro com ${rowCount} tentativas e ${config.length} letras por palavra.`);
+
+        for (let row = 0; row < rowCount; row += 1) {
+          const submitted = game.guesses[row];
+          const letters = submitted ? Array.from(submitted.word) : row === currentRow && game.status === 'playing' ? draft : [];
+          for (let column = 0; column < config.length; column += 1) {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.setAttribute('role', 'gridcell');
+            const character = letters[column] || '';
+            tile.textContent = character;
+            if (character) tile.classList.add('filled');
+            if (submitted) {
+              tile.classList.add(submitted.results[column]);
+              tile.setAttribute('aria-label', `${character}: ${submitted.results[column]}`);
+            } else {
+              tile.setAttribute('aria-label', character || 'vazio');
+              if (row === currentRow && character) tile.classList.add('current');
+            }
+            board.append(tile);
+          }
+        }
+
+        attemptLabel.textContent = game.status === 'playing'
+          ? `Tentativa ${Math.min(game.guesses.length + 1, rowCount)} de ${rowCount}`
+          : `Partida encerrada · ${game.guesses.length} ${game.guesses.length === 1 ? 'tentativa' : 'tentativas'}`;
+        input.maxLength = config.length;
+        input.disabled = game.status !== 'playing';
+        input.value = game.draft;
+        mockup.querySelectorAll('[data-difficulty]').forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.difficulty === game.difficulty));
+        });
+        const statValues = mockup.querySelectorAll('.stat strong');
+        statValues[0].textContent = String(game.stats.games);
+        statValues[1].textContent = String(game.stats.wins);
+        statValues[2].textContent = game.stats.wins
+          ? (game.stats.winningGuesses / game.stats.wins).toFixed(1).replace('.', ',')
+          : '—';
+        mockup.querySelectorAll('.key[data-key]').forEach((key) => {
+          key.classList.remove('correct', 'present', 'absent');
+          if (keyboardState[key.dataset.key]) key.classList.add(keyboardState[key.dataset.key]);
+          key.disabled = game.status !== 'playing';
+        });
+        if (game.status === 'playing' && message.dataset.finished === 'true') {
+          message.replaceChildren();
+          message.dataset.finished = 'false';
+          message.dataset.state = '';
+        }
+      });
+    }
+
+    function buildControls() {
+      document.querySelectorAll('.mockup').forEach((mockup) => {
+        const difficultySelect = mockup.querySelector('.difficulty-select');
+        if (difficultySelect) {
+          const group = document.createElement('div');
+          group.className = 'difficulty-group';
+          group.setAttribute('role', 'group');
+          group.setAttribute('aria-label', 'Escolha a dificuldade');
+          group.innerHTML = '<button class="difficulty" type="button" data-difficulty="easy">Fácil · 4</button><button class="difficulty" type="button" data-difficulty="medium">Médio · 5</button><button class="difficulty" type="button" data-difficulty="hard">Difícil · 6</button>';
+          difficultySelect.replaceWith(group);
+        } else {
+          const group = mockup.querySelector('.difficulty-group');
+          Array.from(group.children).forEach((oldButton, index) => {
+            const ids = ['easy', 'medium', 'hard'];
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'difficulty';
+            button.dataset.difficulty = ids[index];
+            button.textContent = oldButton.textContent;
+            oldButton.replaceWith(button);
+          });
+          group.setAttribute('role', 'group');
+          group.setAttribute('aria-label', 'Escolha a dificuldade');
+        }
+
+        const form = document.createElement('form');
+        form.className = 'guess-form';
+        const input = document.createElement('input');
+        input.className = 'guess-input';
+        input.type = 'text';
+        input.autocomplete = 'off';
+        input.autocapitalize = 'characters';
+        input.spellcheck = false;
+        input.setAttribute('aria-label', 'Digite seu palpite');
+        input.placeholder = 'Digite seu palpite';
+        const submit = document.createElement('button');
+        submit.className = 'mock-button';
+        submit.type = 'submit';
+        submit.textContent = 'Enviar';
+        form.append(input, submit);
+        mockup.querySelector('.input-preview').replaceWith(form);
+        const message = document.createElement('p');
+        message.className = 'game-message';
+        message.setAttribute('role', 'status');
+        message.setAttribute('aria-live', 'polite');
+        message.dataset.finished = 'false';
+        form.after(message);
+
+        let keyboard = mockup.querySelector('.keyboard');
+        if (!keyboard) {
+          keyboard = document.createElement('div');
+          keyboard.className = 'keyboard';
+          form.after(keyboard);
+        }
+        keyboard.removeAttribute('aria-hidden');
+        keyboard.setAttribute('aria-label', 'Teclado virtual');
+        keyboard.replaceChildren();
+        keyboardRows.forEach((letters) => {
+          const row = document.createElement('div');
+          row.className = 'keyboard-row';
+          Array.from(letters).forEach((letter) => {
+            const key = document.createElement('button');
+            key.type = 'button';
+            key.className = 'key';
+            key.dataset.key = letter;
+            key.textContent = letter;
+            key.setAttribute('aria-label', letter);
+            row.append(key);
+          });
+          keyboard.append(row);
+        });
+        const finalRow = keyboard.lastElementChild;
+        const enter = document.createElement('button');
+        enter.type = 'button';
+        enter.className = 'key wide';
+        enter.dataset.key = 'ENTER';
+        enter.textContent = 'ENTRAR';
+        const backspace = document.createElement('button');
+        backspace.type = 'button';
+        backspace.className = 'key wide';
+        backspace.dataset.key = 'BACKSPACE';
+        backspace.textContent = '⌫';
+        backspace.setAttribute('aria-label', 'Apagar letra');
+        finalRow.prepend(enter);
+        finalRow.append(backspace);
+
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          submitGuess();
+        });
+        input.addEventListener('input', () => {
+          const maxLength = difficulties[game.difficulty].length;
+          game.draft = Array.from(input.value.toLocaleUpperCase('pt-BR').replace(/[^\p{L}]/gu, '')).slice(0, maxLength).join('');
+          document.querySelectorAll('.guess-input').forEach((field) => { field.value = game.draft; });
+          document.querySelectorAll('.game-message').forEach((element) => {
+            if (element.dataset.finished !== 'true') {
+              element.replaceChildren();
+              element.dataset.state = '';
+            }
+          });
+          renderGame();
+        });
+      });
+
+      document.addEventListener('click', (event) => {
+        if (event.target.closest('[data-open-rules]')) {
+          document.getElementById('rules-dialog').showModal();
+          return;
+        }
+        if (event.target.closest('[data-close-rules]')) {
+          document.getElementById('rules-dialog').close();
+          return;
+        }
+        const difficultyButton = event.target.closest('[data-difficulty]');
+        if (difficultyButton) {
+          newGame(difficultyButton.dataset.difficulty);
+          announce('Nova partida iniciada.', '', false);
+          return;
+        }
+        const key = event.target.closest('[data-key]');
+        if (key) handleKey(key.dataset.key);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.target.matches('input, textarea, select, [contenteditable="true"]')) return;
+        if (/^\p{L}$/u.test(event.key)) {
+          event.preventDefault();
+          handleKey(event.key.toLocaleUpperCase('pt-BR'));
+        } else if (event.key === 'Backspace') {
+          event.preventDefault();
+          handleKey('BACKSPACE');
+        } else if (event.key === 'Enter') {
+          event.preventDefault();
+          handleKey('ENTER');
+        }
+      });
+    }
+
+    function handleKey(key) {
+      if (game.status !== 'playing') return;
+      const letters = Array.from(game.draft);
+      if (key === 'ENTER') {
+        submitGuess();
+      } else if (key === 'BACKSPACE') {
+        letters.pop();
+        game.draft = letters.join('');
+      } else if (/^\p{L}$/u.test(key) && letters.length < difficulties[game.difficulty].length) {
+        letters.push(key);
+        game.draft = letters.join('');
+      }
+      renderGame();
+      const activeInput = document.querySelector('.concept-panel:not([hidden]) .guess-input');
+      if (activeInput && document.activeElement.matches('.key')) activeInput.focus();
+    }
+
+    buildControls();
+    newGame();
   </script>
 </body>
 </html>
